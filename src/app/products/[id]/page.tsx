@@ -1,15 +1,17 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation"; // Updated import
 
-export default function Product() {
+export default function Product({
+    params,
+}: {
+    params: Promise<{ id: BigInteger }>
+}) {
     const [product, setProduct] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
 
-    const searchParams = useSearchParams(); // Access search parameters
-    const id = searchParams.get("id"); // Extract the `id` from the URL query
+    const id = (params).id;
 
     useEffect(() => {
         if (!id) return; // Wait for the `id` to be available
@@ -41,6 +43,18 @@ export default function Product() {
         return <p className="text-center text-red-500">Failed to load product details.</p>;
     }
 
+    const MAX_STARS = 5;
+    const stars = [];
+
+    for (let i = 0; i < MAX_STARS; i++) {
+        if (i < Math.floor(product.rating.rate)) {
+            stars.push(<span key={i} className="text-yellow-500">★</span>); // Filled star
+        } else if (i < product.rating.rate) {
+            stars.push(<span key={i} className="text-yellow-300">☆</span>); // Half star
+        } else {
+            stars.push(<span key={i} className="text-gray-400">★</span>); // Empty star
+        }
+    }
     return (
         <>
             {/* Product Detail Section */}
@@ -66,8 +80,8 @@ export default function Product() {
                             <div className="flex items-center mb-6">
                                 <span className="text-2xl font-bold text-blue-500">{product.price}</span>
                                 <span className="ml-4 flex items-center text-yellow-500">
-                                    ★★★★☆
-                                    <span className="text-gray-600 text-sm ml-2">(120 reviews)</span>
+                                    {stars}
+                                    <span className="text-gray-600 text-sm ml-2">({product.rating.count} reviews)</span>
                                 </span>
                             </div>
                             {/* Add to Cart and Quantity */}
