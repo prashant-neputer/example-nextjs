@@ -1,23 +1,47 @@
 "use client"
+import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+
+interface Product {
+    id: number;
+    title: string;
+    price: number;
+    description: string;
+    category: string;
+    image: string;
+    rating?: {
+        rate: number;
+        count: number;
+    };
+}
+
+const fetchProducts = async () => {
+    const res = await fetch("https://fakestoreapi.com/products");
+
+    if (!res.ok) {
+        throw new Error("Failed to fetch products");
+    }
+    return await res.json();
+}
+
 
 export default function Products() {
-    const [products, setProducts] = useState([]);
+    const { data: products, isLoading, isError } = useQuery({
+        queryKey: ["products"],
+        queryFn: fetchProducts,
+        retry: 1,
+        staleTime: 5 * 60 * 1000, // 5 minutes
+    });
 
-    useEffect(() => {
-        const fetchProducts = async () => {
-            try {
-                const res = await fetch("https://fakestoreapi.com/products");
-                const data = await res.json();
-                setProducts(data);
-            } catch (error) {
-                console.error("Error fetching products:", error);
-            }
-        };
-        fetchProducts();
-    }, []);
+    // Loading state
+    if (isLoading) {
+        return <p className="text-center text-blue-500">Loading...</p>;
+    }
 
+    // Error state
+    if (isError || !products) {
+        return <p className="text-center text-red-500">Failed to load product details.</p>;
+    }
 
     return (
         <section className="py-16">

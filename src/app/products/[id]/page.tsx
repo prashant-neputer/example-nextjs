@@ -3,15 +3,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 
-// Create a function to fetch product details
-const fetchProduct = async (id: string) => {
-    const res = await fetch(`https://fakestoreapi.com/products/${id}`);
-    if (!res.ok) {
-        throw new Error("Failed to fetch product");
-    }
-    return res.json();
-};
-
 // Type definition for the product
 interface Product {
     id: number;
@@ -25,6 +16,15 @@ interface Product {
         count: number;
     };
 }
+
+// Create a function to fetch product details
+const fetchProduct = async (id: string) => {
+    const res = await fetch(`https://fakestoreapi.com/products/${id}`);
+    if (!res.ok) {
+        throw new Error("Failed to fetch product");
+    }
+    return res.json();
+};
 
 export default function Product({
     params,
